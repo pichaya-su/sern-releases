@@ -1,0 +1,18 @@
+{
+  "id": "sern.commit-link",
+  "name": "Commit link",
+  "version": "1.0.0",
+  "description": "Opens commits, branches and the repository on GitHub, GitLab or Bitbucket, or copies a commit's link.",
+  "author": "SERN",
+  "sernApi": 1,
+  "main": "main.js",
+  "permissions": ["repo", "open-url", "clipboard"],
+  "contributes": {
+    "commands": [
+      { "id": "open-commit", "title": "Open commit on the web", "scope": "commit" },
+      { "id": "copy-commit", "title": "Copy commit link", "scope": "commit" },
+      { "id": "open-branch", "title": "Open branch on the web", "scope": "branch" },
+      { "id": "open-repo", "title": "Open repository on the web", "scope": "repo" }
+    ]
+  }
+}

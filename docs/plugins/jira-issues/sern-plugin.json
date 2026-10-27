@@ -1,0 +1,18 @@
+{
+  "id": "sern.jira-issues",
+  "name": "Jira issues",
+  "version": "1.0.0",
+  "description": "Shows the Jira issues a commit mentions (like ABC-123), with their status, from your Atlassian site.",
+  "author": "SERN",
+  "sernApi": 1,
+  "main": "main.js",
+  "permissions": ["repo", "network", "open-url"],
+  "network": ["*.atlassian.net"],
+  "contributes": {
+    "commands": [
+      { "id": "show", "title": "Show Jira issues", "scope": "commit" },
+      { "id": "sign-in", "title": "Jira: sign in…", "scope": "repo" },
+      { "id": "sign-out", "title": "Jira: sign out", "scope": "repo" }
+    ]
+  }
+}

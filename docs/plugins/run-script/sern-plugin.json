@@ -1,0 +1,17 @@
+{
+  "id": "example.run-script",
+  "name": "Run script",
+  "version": "1.0.0",
+  "description": "Runs the PowerShell and batch scripts that come with it",
+  "author": "SERN",
+  "sernApi": 1,
+  "main": "main.js",
+  "permissions": ["scripts"],
+  "scripts": { "info": "scripts/info.ps1", "hello": "scripts/hello.bat" },
+  "contributes": {
+    "commands": [
+      { "id": "info", "title": "Show repository info (PowerShell)", "scope": "repo" },
+      { "id": "hello", "title": "Say hello (batch)", "scope": "app" }
+    ]
+  }
+}
