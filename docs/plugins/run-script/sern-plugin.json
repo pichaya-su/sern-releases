@@ -7,11 +7,18 @@
   "sernApi": 1,
   "main": "main.js",
   "permissions": ["scripts"],
-  "scripts": { "info": "scripts/info.ps1", "hello": "scripts/hello.bat" },
+  "scripts": {
+    "info": "scripts/info.ps1",
+    "hello": "scripts/hello.bat",
+    "steps": "scripts/steps.ps1",
+    "admin": { "path": "scripts/admin.ps1", "admin": true }
+  },
   "contributes": {
     "commands": [
       { "id": "info", "title": "Show repository info (PowerShell)", "scope": "repo" },
-      { "id": "hello", "title": "Say hello (batch)", "scope": "app" }
+      { "id": "hello", "title": "Say hello (batch)", "scope": "app" },
+      { "id": "steps", "title": "Run a slow task with progress", "scope": "app" },
+      { "id": "admin", "title": "Check running as administrator", "scope": "app" }
     ]
   }
 }

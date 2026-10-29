@@ -5,7 +5,7 @@
 // message says why.
 
 declare namespace Sern {
-  type Scope = "app" | "repo" | "commit" | "branch" | "file";
+  type Scope = "app" | "new-tab" | "repo" | "commit" | "branch" | "file";
   type ChangeKind = "added" | "modified" | "deleted" | "renamed" | "copied" | "typechange" | "untracked" | "conflicted";
 
   interface Commit {
@@ -23,7 +23,7 @@ declare namespace Sern {
   /** What a command was run on. */
   interface CommandContext {
     scope: Scope;
-    /** null for an "app" command run with no repository open. */
+    /** null for an "app" or "new-tab" command run with no repository open. */
     repo: { root: string; name: string } | null;
     /** Current branch; null when HEAD is detached. */
     branch: string | null;
@@ -105,8 +105,8 @@ declare namespace Sern {
       }
     | { type: "checkbox"; id: string; label?: string; value?: boolean; hint?: string }
     /**
-     * A searchable dropdown of the git repositories in `folder` (a full path; "~" is the home
-     * folder) and the folders below it. Its value is the picked repository's full path, or "".
+     * A list, with a search box on top, of the git repositories in `folder` (a full path; "~" is
+     * the home folder) and the folders below it. Its value is the picked repository's full path, or "".
      */
     | {
         type: "repo";
@@ -206,7 +206,8 @@ declare const sern: {
   };
   /**
    * Needs the "scripts" permission. Runs the plugin's own .ps1, .bat or .cmd scripts, listed by
-   * name in the manifest's "scripts".
+   * name in the manifest's "scripts". One listed as { "path": …, "admin": true } runs as
+   * administrator: the user is asked every time, then Windows asks too.
    */
   scripts: {
     /**
@@ -215,8 +216,17 @@ declare const sern: {
      * (1 to 3600, 600 by default). Rejects if the user says no ("You chose not to run it."), the
      * script runs too long, or a batch argument can't be passed safely. In a batch file, read
      * arguments as %1 or "%~1", never a bare %~1 (cmd would run what follows a "&" in them).
+     *
+     * `show` puts up a panel while it runs: "progress" (a bar; closes when the script succeeds) or
+     * "log" (the bar and the output, live; stays open until closed), titled `title` (the script's
+     * name by default). The user can stop it there, which rejects with "The script was stopped."
+     * The script moves the bar by printing "##sern[progress] 40 Compiling" lines to stdout (a
+     * percentage, then a message; with no number the bar just moves); they're left out of stdout.
      */
-    run(name: string, options?: { args?: string[]; timeout?: number }): Promise<Sern.GitOutput>;
+    run(
+      name: string,
+      options?: { args?: string[]; timeout?: number; show?: "progress" | "log"; title?: string },
+    ): Promise<Sern.GitOutput>;
   };
   /**
    * Needs the "network" permission, and the host listed in the manifest's "network".

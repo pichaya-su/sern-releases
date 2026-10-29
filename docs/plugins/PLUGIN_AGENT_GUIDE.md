@@ -33,6 +33,7 @@ my-plugin/
    | `scope` | Shows up in | Handler gets |
    |---|---|---|
    | `app` | command palette, even with no repository open (sign in, settings…) | `repo`, `branch`, `head`; all `null` with no repository open |
+   | `new-tab` | new tab menu (+) and welcome page, after Open and Clone; command palette; even with no repository open (pick a repository, then `sern.repo.open`) | as `app` |
    | `repo` (default) | repository menu, command palette | `repo`, `branch`, `head` |
    | `commit` | right-click a commit in History; the palette while a commit is open | plus `commit` |
    | `branch` | right-click a branch in the sidebar (never the palette) | plus `targetBranch` |
@@ -87,9 +88,9 @@ Validation rules. A manifest that breaks any of these is refused at install:
 | `sernApi` | Required. Must be the number `1`. |
 | `main` | Required. A path inside the folder, and the file must exist. |
 | `permissions` | Optional. Each one of `repo`, `git`, `actions`, `scripts`, `network`, `open-url`, `clipboard`; an unknown name refuses the whole manifest. |
-| `scripts` | Required with the `scripts` permission, and only allowed with it. An object of up to 20 names and paths: `{ "build": "scripts/build.ps1" }`. Names match `^[A-Za-z0-9][\w.-]*$`. Paths are relative to the plugin's folder (`/` or `\`), with no `..`, no drive and no `:`, and end in `.ps1`, `.bat` or `.cmd`. The files must exist when the script runs. |
+| `scripts` | Required with the `scripts` permission, and only allowed with it. An object of up to 20 names and paths: `{ "build": "scripts/build.ps1" }`. A script that runs as administrator is an object instead: `{ "setup": { "path": "scripts/setup.ps1", "admin": true } }`. Names match `^[A-Za-z0-9][\w.-]*$`. Paths are relative to the plugin's folder (`/` or `\`), with no `..`, no drive and no `:`, and end in `.ps1`, `.bat` or `.cmd`. The files must exist when the script runs. |
 | `network` | Required with the `network` permission, and only allowed with it. A list of up to 20 lowercase hosts: either exact (`"api.github.com"`) or `"*.example.com"`, which matches every subdomain but not `example.com` itself. No scheme, port or path. `"*.com"` and `"localhost"` are refused. List the fewest hosts that work. |
-| `contributes.commands` | Optional, at most 50. Each `id` matches `^[A-Za-z0-9][\w.-]*$` (at most 64 characters, no duplicates). Each `title` is non-empty, at most 80 characters, and written as an action ("Copy commit link"). `scope` is one of `repo`, `commit`, `branch`, `file`. |
+| `contributes.commands` | Optional, at most 50. Each `id` matches `^[A-Za-z0-9][\w.-]*$` (at most 64 characters, no duplicates). Each `title` is non-empty, at most 80 characters, and written as an action ("Copy commit link"). `scope` is one of `app`, `new-tab`, `repo`, `commit`, `branch`, `file`. |
 
 Package limits: at most 2000 files and 50 MB unpacked, and `main.js` at most 5 MB.
 
@@ -268,8 +269,8 @@ that by name. To run a script that comes with the plugin, use the `scripts` perm
 
 ### `scripts` permission
 
-`sern.scripts.run(name, { args?, timeout? })` runs the script listed as `name` in the manifest's `scripts` and
-resolves to `{ code, stdout, stderr }`.
+`sern.scripts.run(name, { args?, timeout?, show?, title? })` runs the script listed as `name` in the manifest's
+`scripts` and resolves to `{ code, stdout, stderr }`.
 
 - The user is asked before each run, unless they chose **Always run its scripts** for the plugin. If they decline,
   the call rejects with "You chose not to run it." Handle that rejection quietly.
@@ -284,8 +285,20 @@ resolves to `{ code, stdout, stderr }`.
   it drops the quotes, and cmd then runs whatever follows a `&` or `|` in the value.
 - A non-zero exit code **does not reject**. Check `code` yourself. Each stream keeps its first 10 MB.
 - `timeout` is in seconds, from 1 to 3600 (default 600). A script still running then is stopped and the call rejects.
+- **For anything that takes more than a few seconds, pass `show`.** `show: "progress"` shows a panel with a progress
+  bar that closes itself when the script succeeds; `show: "log"` also shows the output live and stays open until the
+  user closes it. `title` names the panel (default: the script's name). The user can stop the script from the panel:
+  the call then rejects with "The script was stopped." Handle that quietly too.
+- To move the bar, the script prints `##sern[progress] <percent> <message>` lines to stdout, e.g.
+  `Write-Output "##sern[progress] 40 Compiling"`. Without a number the bar just moves. These lines are left out of
+  `stdout`. `Write-Progress` doesn't reach SERN.
 - Prefer `repo`, `git` or `network` when they can do the job: scripts are the one thing that runs outside the
   sandbox.
+- **Only if a script truly needs administrator rights**, list it as `{ "path": "scripts/setup.ps1", "admin": true }`.
+  It then runs as administrator: SERN asks before every run (even with **Always run its scripts**), and Windows' UAC
+  prompt follows. If the user declines that, the call rejects with "You didn't let the script run as
+  administrator." `timeout` counts from the user's yes; everything else works as above. Mapped drive letters may be
+  missing for it: use `\\server\share` paths.
 
 ### Commit message template (no permission needed)
 

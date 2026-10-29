@@ -73,14 +73,15 @@ picks the plugin up the next time you switch to it.
 | `main` | The script to run, relative to the folder. |
 | `permissions` | Any of the permissions below; leave it out if you need none. |
 | `network` | The hosts the `network` permission may reach: `"api.github.com"`, or `"*.atlassian.net"` for any subdomain. Required with that permission, at most 20. |
-| `scripts` | The scripts the `scripts` permission may run, by name: `{ "build": "scripts/build.ps1" }`. `.ps1`, `.bat` or `.cmd` files in the plugin's folder. Required with that permission, at most 20. |
+| `scripts` | The scripts the `scripts` permission may run, by name: `{ "build": "scripts/build.ps1" }`, or `{ "setup": { "path": "scripts/setup.ps1", "admin": true } }` for one that [runs as administrator](#running-a-script-as-administrator). `.ps1`, `.bat` or `.cmd` files in the plugin's folder. Required with that permission, at most 20. |
 | `contributes.commands` | Up to 50 commands, each with an `id`, a `title` and a `scope`. |
 
-A command's `scope` decides where it shows up, as for custom actions (`app` is for plugins only):
+A command's `scope` decides where it shows up, as for custom actions (`app` and `new-tab` are for plugins only):
 
 | Scope | Shows up in |
 |---|---|
 | `app` | the command palette, even with no repository open: for commands like signing in to a service |
+| `new-tab` | the new tab menu (**+**) and the welcome page, after Open and Clone, and the command palette, even with no repository open: for commands that open a repository with `sern.repo.open` |
 | `repo` (default) | the repository menu and the command palette |
 | `commit` | the commit's right-click menu in History, and the palette while a commit is open |
 | `branch` | the branch's right-click menu in the sidebar |
@@ -136,7 +137,7 @@ esbuild src/main.ts --bundle --format=iife --outfile=main.js
 | `sern.repo.open(path)`: opens that repository in SERN; `{ root, name }` | `repo` |
 | `sern.git.run(["tag", "v1.0"])`: `{ code, stdout, stderr }` | `git` |
 | `sern.actions.list()`: `[{ name }]`; `sern.actions.run(name)`: what the action printed (see below) | `actions` |
-| `sern.scripts.run(name, { args?, timeout? })`: runs one of the plugin's own scripts; `{ code, stdout, stderr }` (see below) | `scripts` |
+| `sern.scripts.run(name, { args?, timeout?, show?, title? })`: runs one of the plugin's own scripts; `{ code, stdout, stderr }` (see below) | `scripts` |
 | `sern.commit.setTemplate({ summary, body? } \| null)`: pre-fills the commit message (see below) | |
 | `sern.http.fetch(url, { method?, headers?, body? })`: `{ status, ok, headers, body, json(), text() }` | `network` |
 | `sern.env.openUrl(url)`: http and https only | `open-url` |
@@ -156,7 +157,7 @@ Dialogs from plugins show the plugin's name, and they open one at a time.
 | `select` | a dropdown of `options` (up to 2000); with more than 10 it gets a search box | the picked option's `value` |
 | `radio` | a row of choices from `options` (up to 20) | the picked option's `value`, or "" |
 | `checkbox` | a checkbox | true or false |
-| `repo` | a searchable dropdown of the git repositories in `folder` (see below) | the picked repository's full path, or "" |
+| `repo` | a list of the git repositories in `folder`, with a search box on top (see below) | the picked repository's full path, or "" |
 | `info` | text between the fields | none |
 
 Every field but `info` needs an `id`. Each can also have a `label`, a `value` to start with, a `hint` under it,
@@ -189,7 +190,11 @@ name relative to it (`api`, `acme/web`). `depth` says how many folders deep to l
 `folder/A`, the default 2 also finds `folder/A/dev`, and 3 finds `folder/A/dev/app`. SERN doesn't look inside a
 repository, or in hidden folders, `node_modules`, `target`, `dist`, `build` and `vendor`. Folders at the end that
 every repository shares are left out of the names: with `depth: 3`, `code/a/dev/dev`, `code/b/dev/dev` and
-`code/c/dev/dev` show as `a`, `b` and `c` (hover one for its full path). Search looks at the names only.
+`code/c/dev/dev` show as `a`, `b` and `c`, each with its full path beside it.
+
+The list is always open, with a search box on top that looks at the names only. Typing picks the first match,
+↑ ↓ (and Page Up/Down) move the pick, and Enter or a double click sends the form. Escape clears the search, then
+closes the dialog.
 
 The form opens at once and the field says "Looking for repositories…" until the folder has been looked through;
 OK waits for it. SERN stops after 10,000 folders, 2 seconds or 2000 repositories and says under the field that
@@ -270,11 +275,70 @@ await sern.ui.showOutput("Build", out.stdout);
   web APIs are safest in a `.ps1`, where they're always plain text.
 - No window opens and the script gets no input, so it can't prompt: a `Read-Host` or `pause` gets nothing.
 - A failing exit code is part of the result, not an error. Output keeps the first 10 MB of each stream.
-- `timeout` is in seconds, from 1 to 3600, 600 by default. A script still running then is stopped and the call rejects.
-  A program the script started on its own (`start …`) isn't stopped.
+- `timeout` is in seconds, from 1 to 3600, 600 by default. A script still running then is stopped, along with the
+  programs it's running, and the call rejects.
 - The call rejects if the user says no (`"You chose not to run it."`).
 
 Scripts aren't sandboxed: a script can do anything the user can. Prefer `git` or `network` when they're enough.
+
+#### Running a script as administrator
+
+A script that needs administrator rights, to install a service or change machine-wide settings, says so in the
+manifest:
+
+```json
+"scripts": { "setup": { "path": "scripts/setup.ps1", "admin": true }, "build": "scripts/build.ps1" }
+```
+
+It's run with `sern.scripts.run("setup")` like any other, and the rules above still apply, with these differences:
+
+- The install dialog marks it **as administrator**. An update that makes a script run as administrator asks again.
+- SERN asks before every run, whatever the user chose for the plugin's other scripts. Then Windows asks too (the
+  UAC prompt): it names SERN, because a copy of SERN runs the script and sends its output back. The call rejects
+  if the user says no to either (`"You didn't let the script run as administrator."` for Windows' prompt).
+- `timeout` counts from the user's yes. Output, `show` panels, progress lines and **Stop** work as usual.
+- As administrator the script gets the user's environment afresh rather than SERN's, and drives mapped to a
+  letter by the user (`Z:`) may be missing: use the full `\\server\share` path.
+
+Ask for it only for the scripts that need it, and keep them short.
+
+#### Showing progress and output
+
+By default a script runs out of sight and the call resolves when it ends. For a longer one, pass `show` and SERN
+shows a panel in the bottom-left corner while it runs, titled `title` (the script's name by default):
+
+| `show` | The panel |
+|---|---|
+| `"progress"` | a progress bar and the script's latest line; closes itself when the script succeeds, and stays to show a failure |
+| `"log"` | the bar, and the script's output as it prints it; stays open after the script ends until the user closes it |
+
+Either way the user can open or hide the output, expand the panel into a dialog over the whole window (a panel
+expanded that way stays open after the script ends), and stop the script with **Stop**: it's stopped along with the
+programs it's running, and the call rejects with `"The script was stopped."`. The panel keeps the last 2000 lines;
+the result still has all of the output (up to 10 MB). stderr shows in red.
+
+To move the bar, print a line starting with `##sern[progress]` to stdout. A number after it is the percentage
+(0 to 100), and the rest is the message shown under the bar. Without a number, the bar sweeps back and forth
+until the next one. These lines are left out of the output and of `stdout`.
+
+```powershell
+Write-Output "##sern[progress] 0 Restoring packages"
+dotnet restore
+Write-Output "##sern[progress] 40 Compiling"
+dotnet build --no-restore
+Write-Output "##sern[progress] Waiting for the server"   # no number: the bar just moves
+```
+
+```bat
+echo ##sern[progress] 50 Copying files
+```
+
+```js
+const out = await sern.scripts.run("build", { show: "log", title: "Building", timeout: 900 });
+```
+
+PowerShell's `Write-Progress` doesn't reach SERN; use `Write-Output` or `Write-Host` with the line above. A line
+updated in place with `\r` shows as its last version.
 
 ### Calling web APIs
 
