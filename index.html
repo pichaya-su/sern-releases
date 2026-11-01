@@ -1,0 +1,397 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SERN, a Git GUI for Windows</title>
+  <meta name="description" content="SERN is a simple, fast Git GUI for Windows: stage single lines, rebase by dragging, review pull requests, and add your own commands with plugins.">
+  <meta property="og:title" content="SERN, a Git GUI for Windows">
+  <meta property="og:description" content="Stage single lines, rebase by dragging, review pull requests, and add your own commands with plugins.">
+  <meta property="og:type" content="website">
+  <meta name="theme-color" content="#fbfbfa" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#161615" media="(prefers-color-scheme: dark)">
+  <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400..700&family=JetBrains+Mono:wght@400..700&family=Saira:wght@400..600&display=swap">
+  <link rel="stylesheet" href="assets/site.css">
+  <link rel="stylesheet" href="assets/home.css">
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script defer src="assets/home.js"></script>
+</head>
+<body>
+  <!-- Icons (Lucide, ISC license), and the curves a feature branch forks and merges with. -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/></symbol>
+    <symbol id="i-branch" viewBox="0 0 24 24"><path d="M6 3v12"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/></symbol>
+    <symbol id="i-folder" viewBox="0 0 24 24"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M12 5v14"/></symbol>
+    <symbol id="i-min" viewBox="0 0 24 24"><path d="M5 12h14"/></symbol>
+    <symbol id="i-max" viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="14" rx="1"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
+    <symbol id="i-file" viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/></symbol>
+    <symbol id="i-history" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></symbol>
+    <symbol id="i-pr" viewBox="0 0 24 24"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M13 6h3a2 2 0 0 1 2 2v7"/><path d="M6 9v12"/></symbol>
+    <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></symbol>
+    <symbol id="i-fetch" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></symbol>
+    <symbol id="i-down" viewBox="0 0 24 24"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></symbol>
+    <symbol id="i-up" viewBox="0 0 24 24"><path d="m5 12 7-7 7 7"/><path d="M12 19V5"/></symbol>
+    <symbol id="i-console" viewBox="0 0 24 24"><path d="m4 17 6-6-6-6"/><path d="M12 19h8"/></symbol>
+    <symbol id="fork" viewBox="0 0 30 28" preserveAspectRatio="none"><path d="M1 0C1 16 29 12 29 28" vector-effect="non-scaling-stroke"/></symbol>
+    <symbol id="merge" viewBox="0 0 30 28" preserveAspectRatio="none"><path d="M29 0C29 16 1 12 1 28" vector-effect="non-scaling-stroke"/></symbol>
+  </svg>
+
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="site-head">
+    <div class="wrap">
+      <a class="brand" href="./"><img src="assets/icon.svg" alt="" width="28" height="28">SERN</a>
+      <nav class="site-nav" aria-label="Site">
+        <a class="wide" href="#features">Features</a>
+        <a class="wide" href="#plugins">Plugins</a>
+        <a href="docs.html">Docs</a>
+      </nav>
+      <a class="btn btn-primary btn-small" href="https://github.com/pichaya-su/sern-releases/releases/latest" data-download>Download</a>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero">
+      <div class="wrap hero-grid">
+        <div>
+          <h1 class="wordmark">SERN</h1>
+          <p class="tagline">A simple, fast Git GUI for Windows.</p>
+          <p class="hero-sub">Stage single lines, rebase by dragging a branch, review pull requests. SERN runs your own git underneath, so everything it does is plain Git.</p>
+          <div class="hero-actions">
+            <a class="btn btn-primary btn-large" href="https://github.com/pichaya-su/sern-releases/releases/latest" data-download>
+              <svg class="i" aria-hidden="true"><use href="#i-download"/></svg>Download for Windows
+            </a>
+            <a class="btn btn-quiet btn-large" href="docs.html">Read the guide</a>
+          </div>
+          <p class="download-meta"><span data-version-line></span>For Windows 10 and 11, with <a href="https://git-scm.com/download/win">Git for Windows</a> installed. Installs without an admin prompt and updates itself.</p>
+        </div>
+
+        <figure class="shot">
+          <div class="app" id="app" role="img" aria-label="Illustration of SERN's History view: three repository tabs, a sidebar of branches and pull requests, and a commit graph where a feature branch and a fix branch fork from main.">
+            <div class="app-bar">
+              <span class="app-tab is-active"><svg class="i" aria-hidden="true"><use href="#i-folder"/></svg>web-shop</span>
+              <span class="app-tab"><svg class="i" aria-hidden="true"><use href="#i-folder"/></svg>docs-site</span>
+              <span class="app-plus"><svg class="i"><use href="#i-plus"/></svg></span>
+              <span class="app-palette"><svg class="i"><use href="#i-search"/></svg><span class="ph">Search or run a command</span><span class="k">Ctrl K</span></span>
+              <span class="app-win"><span><svg class="i"><use href="#i-min"/></svg></span><span><svg class="i"><use href="#i-max"/></svg></span><span><svg class="i"><use href="#i-x"/></svg></span></span>
+            </div>
+            <div class="app-body">
+              <div class="app-side">
+                <div class="s-row"><svg class="i"><use href="#i-file"/></svg>Changes<span class="end">3</span></div>
+                <div class="s-row is-sel"><svg class="i"><use href="#i-history"/></svg>History</div>
+                <div class="s-head">Branches</div>
+                <div class="s-row is-current"><svg class="i"><use href="#i-branch"/></svg>feature/checkout</div>
+                <div class="s-row"><svg class="i"><use href="#i-branch"/></svg>fix/cart-total</div>
+                <div class="s-row"><svg class="i"><use href="#i-branch"/></svg>main</div>
+                <div class="s-head">Pull requests</div>
+                <div class="s-row"><svg class="i"><use href="#i-pr"/></svg>Checkout in steps<span class="end">#42</span></div>
+                <div class="s-head">Remotes</div>
+                <div class="s-row"><svg class="i"><use href="#i-globe"/></svg>origin</div>
+              </div>
+              <div class="app-main">
+                <div class="app-tools">
+                  <span class="t-btn"><svg class="i"><use href="#i-fetch"/></svg><span class="label">Fetch</span></span>
+                  <span class="t-btn"><svg class="i"><use href="#i-down"/></svg><span class="label">Pull</span></span>
+                  <span class="t-btn"><svg class="i"><use href="#i-up"/></svg><span class="label">Push</span><span class="t-badge">2</span></span>
+                  <span class="t-gap"></span>
+                  <span class="t-btn"><svg class="i"><use href="#i-console"/></svg><span class="label">Console</span></span>
+                </div>
+                <div class="log">
+                  <svg class="log-graph" width="56" height="224" viewBox="0 0 56 224">
+                    <path class="l1" style="--d:0" pathLength="1" d="M26 14V158C26 172 10 168 10 182"/>
+                    <path class="l0" style="--d:2" pathLength="1" d="M10 70V224"/>
+                    <path class="l2" style="--d:2" pathLength="1" d="M10 70C10 86 42 82 42 98"/>
+                    <path class="l2" style="--d:3" pathLength="1" d="M42 98V130C42 146 10 142 10 154"/>
+                    <circle class="l1 head" style="--d:0" cx="26" cy="14" r="5"/>
+                    <circle class="l1" style="--d:1" cx="26" cy="42" r="5"/>
+                    <circle class="l0" style="--d:2" cx="10" cy="70" r="5"/>
+                    <circle class="l2" style="--d:3" cx="42" cy="98" r="5"/>
+                    <circle class="l1" style="--d:4" cx="26" cy="126" r="5"/>
+                    <circle class="l0" style="--d:5" cx="10" cy="154" r="5"/>
+                    <circle class="l0" style="--d:6" cx="10" cy="182" r="5"/>
+                    <circle class="l0" style="--d:7" cx="10" cy="210" r="5"/>
+                  </svg>
+                  <div class="log-row is-sel" style="--d:0"><span class="msg"><span class="ref l1">feature/checkout</span><span class="ref l1">#42</span><span>Add the address step to checkout</span></span><span class="who"><span class="av" style="--c:var(--m-l3)">MK</span>Mira K.</span><span class="when">12 min</span></div>
+                  <div class="log-row" style="--d:1"><span class="msg"><span>Check postcodes as you type</span></span><span class="who"><span class="av" style="--c:var(--m-l3)">MK</span>Mira K.</span><span class="when">1 hr</span></div>
+                  <div class="log-row" style="--d:2"><span class="msg"><span class="ref l0">main</span><span class="ref l0">origin/main</span><span>Merge branch 'fix/cart-total'</span></span><span class="who"><span class="av" style="--c:var(--m-l5)">TB</span>Tom B.</span><span class="when">3 hr</span></div>
+                  <div class="log-row" style="--d:3"><span class="msg"><span class="ref l2">fix/cart-total</span><span>Round the cart total once, at the end</span></span><span class="who"><span class="av" style="--c:var(--m-l6)">AR</span>Ana R.</span><span class="when">4 hr</span></div>
+                  <div class="log-row" style="--d:4"><span class="msg"><span>Split checkout into steps</span></span><span class="who"><span class="av" style="--c:var(--m-l3)">MK</span>Mira K.</span><span class="when">Yesterday</span></div>
+                  <div class="log-row" style="--d:5"><span class="msg"><span>Update the payment SDK to 4.2</span></span><span class="who"><span class="av" style="--c:var(--m-l5)">TB</span>Tom B.</span><span class="when">Yesterday</span></div>
+                  <div class="log-row" style="--d:6"><span class="msg"><span class="ref tag l0">v1.4.0</span><span>Show delivery dates on product pages</span></span><span class="who"><span class="av" style="--c:var(--m-l6)">AR</span>Ana R.</span><span class="when">2 days</span></div>
+                  <div class="log-row" style="--d:7"><span class="msg"><span>Cache product images</span></span><span class="who"><span class="av" style="--c:var(--m-l5)">TB</span>Tom B.</span><span class="when">3 days</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <figcaption class="theme-pick" hidden>
+            <div class="swatches" role="radiogroup" aria-label="Theme shown in the picture"></div>
+            <p class="theme-name" aria-live="polite"></p>
+          </figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="features" id="features" aria-labelledby="features-title">
+      <div class="wrap">
+        <h2 class="section-title" id="features-title">What you can do in SERN</h2>
+        <p class="section-intro">Everything here is in the current release. The <a href="docs.html?p=guide">guide</a> walks through each one.</p>
+
+        <ol class="spine">
+          <li class="group" style="--lane: var(--lane-1)">
+            <span class="node" aria-hidden="true"></span>
+            <div class="group-body">
+              <div>
+                <h3>Changes and commits</h3>
+                <p class="lede">See exactly what goes into a commit, and take back what you didn't mean to do.</p>
+                <div class="branch">
+                  <svg class="fork" aria-hidden="true"><use href="#fork"/></svg>
+                  <ul>
+                    <li><strong>Stage files, hunks or single lines.</strong> Click line numbers to pick lines, Shift+click for a range, and discard the same way.</li>
+                    <li><strong>Undo, instead of "Are you sure?"</strong> Discarding changes, deleting a branch or a stash, and a hard reset happen at once and offer Undo.</li>
+                    <li><strong>Commit, amend, push.</strong> The commit button also commits and pushes, or commits and syncs (pull, then push).</li>
+                    <li><strong>Diffs you can read.</strong> Syntax highlighting, unified or side by side, and before and after previews for images.</li>
+                    <li><strong>Always current.</strong> Edits and commits made in your editor or terminal show up right away.</li>
+                  </ul>
+                  <svg class="merge" aria-hidden="true"><use href="#merge"/></svg>
+                </div>
+              </div>
+              <dl class="keys" aria-label="Shortcuts for changes and commits">
+                <div><dt><kbd>Space</kbd></dt><dd>Stage or unstage</dd></div>
+                <div><dt><kbd>Ctrl</kbd><kbd>Enter</kbd></dt><dd>Commit</dd></div>
+                <div><dt><kbd>Ctrl</kbd><kbd>Shift</kbd><kbd>Enter</kbd></dt><dd>Commit and push</dd></div>
+                <div><dt><kbd>Ctrl</kbd><kbd>Shift</kbd><kbd>D</kbd></dt><dd>Unified or side by side</dd></div>
+              </dl>
+            </div>
+          </li>
+
+          <li class="group" style="--lane: var(--lane-3)">
+            <span class="node" aria-hidden="true"></span>
+            <div class="group-body">
+              <div>
+                <h3>History you can rearrange</h3>
+                <p class="lede">One graph across every branch, and the tools to reshape it by hand.</p>
+                <div class="branch">
+                  <svg class="fork" aria-hidden="true"><use href="#fork"/></svg>
+                  <ul>
+                    <li><strong>Commit graph.</strong> Open a commit to read its message, files and diffs. Right-click one to copy its hash, cherry-pick, revert, reword or reset.</li>
+                    <li><strong>Drag branches.</strong> Drop a branch on another to fast-forward, merge or rebase, on a remote branch to push, or on a commit to reset or branch from it.</li>
+                    <li><strong>Interactive rebase.</strong> Reorder, reword, edit, squash, fixup or drop commits with a drag or the keys P, R, E, S, F and D. A finished rebase offers Undo.</li>
+                    <li><strong>File history and blame.</strong> List the commits that changed a file, following renames, and see who last changed each line.</li>
+                  </ul>
+                  <svg class="merge" aria-hidden="true"><use href="#merge"/></svg>
+                </div>
+              </div>
+              <dl class="keys" aria-label="Shortcuts for history">
+                <div><dt><kbd>Ctrl</kbd><kbd>2</kbd></dt><dd>History</dd></div>
+                <div><dt><kbd>Ctrl</kbd><kbd>F</kbd></dt><dd>Search commits</dd></div>
+                <div><dt><kbd>Esc</kbd></dt><dd>Cancel a drag</dd></div>
+              </dl>
+            </div>
+          </li>
+
+          <li class="group" style="--lane: var(--lane-2)">
+            <span class="node" aria-hidden="true"></span>
+            <div class="group-body">
+              <div>
+                <h3>Branches, merges and stashes</h3>
+                <p class="lede">Switch, merge and set work aside without remembering a single flag.</p>
+                <div class="branch">
+                  <svg class="fork" aria-hidden="true"><use href="#fork"/></svg>
+                  <ul>
+                    <li><strong>Branches.</strong> Double-click to switch, and create, rename or delete them. A switch that would conflict offers to stash your changes first.</li>
+                    <li><strong>Merge your way.</strong> Fast-forward when possible, always make a merge commit, or squash. Conflicts wait for you to resolve them, then continue or abort.</li>
+                    <li><strong>Stashes.</strong> Stash everything or only the files you pick, untracked ones too, and browse a stash's diffs before restoring it.</li>
+                    <li><strong>Tags.</strong> Tag any commit, with a message for an annotated tag, and push one or all of them.</li>
+                  </ul>
+                  <svg class="merge" aria-hidden="true"><use href="#merge"/></svg>
+                </div>
+              </div>
+              <dl class="keys" aria-label="Shortcuts for branches">
+                <div><dt><kbd>Ctrl</kbd><kbd>B</kbd></dt><dd>Switch branch</dd></div>
+                <div><dt><kbd>Ctrl</kbd><kbd>Shift</kbd><kbd>N</kbd></dt><dd>New branch</dd></div>
+              </dl>
+            </div>
+          </li>
+
+          <li class="group" style="--lane: var(--lane-5)">
+            <span class="node" aria-hidden="true"></span>
+            <div class="group-body">
+              <div>
+                <h3>Sync and pull requests</h3>
+                <p class="lede">Fetch, pull and push with live progress, and review pull requests next to your code.</p>
+                <div class="branch">
+                  <svg class="fork" aria-hidden="true"><use href="#fork"/></svg>
+                  <ul>
+                    <li><strong>Sign-in handled.</strong> SERN signs in through Git Credential Manager, so pushing over https needs no setup.</li>
+                    <li><strong>Pull and push, your way.</strong> Merge or rebase on pull, per repository. Push to any remote and branch, send tags along, or force push with lease after seeing which commits it would replace.</li>
+                    <li><strong>Pull requests on GitHub and Bitbucket Cloud.</strong> See open ones with their checks and reviews, browse their commits and files, check one out (from a fork too) or merge it.</li>
+                    <li><strong>Create pull requests.</strong> The title and description come from the branch's commits, and the branch is published first if it isn't on the remote yet.</li>
+                  </ul>
+                  <svg class="merge" aria-hidden="true"><use href="#merge"/></svg>
+                </div>
+              </div>
+              <dl class="keys" aria-label="Shortcuts for sync">
+                <div><dt><kbd>Ctrl</kbd><kbd>Shift</kbd><kbd>F</kbd></dt><dd>Fetch</dd></div>
+                <div><dt><kbd>Ctrl</kbd><kbd>Shift</kbd><kbd>P</kbd></dt><dd>Pull</dd></div>
+                <div><dt><kbd>Ctrl</kbd><kbd>P</kbd></dt><dd>Push</dd></div>
+              </dl>
+            </div>
+          </li>
+
+          <li class="group" style="--lane: var(--lane-4)">
+            <span class="node" aria-hidden="true"></span>
+            <div class="group-body">
+              <div>
+                <h3>Made for the keyboard</h3>
+                <p class="lede">Every action in a menu is also a command you can type.</p>
+                <div class="branch">
+                  <svg class="fork" aria-hidden="true"><use href="#fork"/></svg>
+                  <ul>
+                    <li><strong>Command palette.</strong> Run any action by name, or find a file to see its history.</li>
+                    <li><strong>Tabs.</strong> Open several repositories at once. Each tab keeps its own view and draft commit message, and a push keeps going when you switch away.</li>
+                    <li><strong>Git console.</strong> Type any git command in a drawer under the main view, with live output and completion for commands, options, branches and files. Commands that lose work ask first.</li>
+                  </ul>
+                  <svg class="merge" aria-hidden="true"><use href="#merge"/></svg>
+                </div>
+              </div>
+              <dl class="keys" aria-label="Shortcuts for the palette, tabs and console">
+                <div><dt><kbd>Ctrl</kbd><kbd>K</kbd></dt><dd>Command palette</dd></div>
+                <div><dt><kbd>Ctrl</kbd><kbd>`</kbd></dt><dd>Git console</dd></div>
+                <div><dt><kbd>Ctrl</kbd><kbd>T</kbd></dt><dd>New tab</dd></div>
+                <div><dt><kbd>Ctrl</kbd><kbd>Tab</kbd></dt><dd>Next tab</dd></div>
+              </dl>
+            </div>
+          </li>
+
+          <li class="group" style="--lane: var(--lane-6)">
+            <span class="node" aria-hidden="true"></span>
+            <div class="group-body">
+              <div>
+                <h3>Make it yours</h3>
+                <p class="lede">Add the commands your team keeps typing, and pick how SERN looks.</p>
+                <div class="branch">
+                  <svg class="fork" aria-hidden="true"><use href="#fork"/></svg>
+                  <ul>
+                    <li><strong>Custom actions.</strong> Add commands such as <code>git tag {input:Tag name} {commit}</code> or <code>code {repo}</code> to the palette and right-click menus.</li>
+                    <li><strong>Plugins.</strong> Install a <code>.sernx</code> plugin to add commands that can call web APIs like Jira or GitHub. Each runs in a sandbox with only the permissions you allow. <a href="#plugins">Write your own</a>.</li>
+                    <li><strong>Themes.</strong> Light and Dark, Glass, Telemetry and Orbit, each in a light and a dark version. Try them on the picture at the top of the page.</li>
+                  </ul>
+                  <svg class="merge" aria-hidden="true"><use href="#merge"/></svg>
+                </div>
+              </div>
+            </div>
+          </li>
+
+          <li class="group" style="--lane: var(--lane-7)">
+            <span class="node" aria-hidden="true"></span>
+            <div class="group-body">
+              <div>
+                <h3>AI, when you want it</h3>
+                <p class="lede">Off until you connect Anthropic (Claude) or any OpenAI-compatible server, such as OpenAI, Ollama, LM Studio or OpenRouter. Your key stays in Windows Credential Manager.</p>
+                <div class="branch">
+                  <svg class="fork" aria-hidden="true"><use href="#fork"/></svg>
+                  <ul>
+                    <li><strong>Commit messages.</strong> Written from your staged changes, in the style of your recent commits, Conventional Commits, or plain.</li>
+                    <li><strong>Ask AI.</strong> A chat that knows your branch, changes and recent commits. The git commands it suggests run in the console, so risky ones still ask first.</li>
+                    <li><strong>Explain.</strong> Have a commit explained, or a failed command and how to fix it.</li>
+                    <li><strong>Conflicts.</strong> Get a proposed merged file to review before it replaces yours.</li>
+                  </ul>
+                  <svg class="merge" aria-hidden="true"><use href="#merge"/></svg>
+                </div>
+              </div>
+              <dl class="keys" aria-label="Shortcuts for AI">
+                <div><dt><kbd>Ctrl</kbd><kbd>Shift</kbd><kbd>G</kbd></dt><dd>Write the commit message</dd></div>
+                <div><dt><kbd>Ctrl</kbd><kbd>Shift</kbd><kbd>A</kbd></dt><dd>AI chat</dd></div>
+              </dl>
+            </div>
+          </li>
+
+          <li class="group is-end">
+            <span class="node" aria-hidden="true"></span>
+            <h3>And the details</h3>
+            <p class="lede">Remotes, push URLs, blame, the conflict resolver and every shortcut are in the <a href="docs.html?p=guide">guide</a>.</p>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="plugins" id="plugins" aria-labelledby="plugins-title">
+      <div class="wrap split">
+        <div>
+          <h2 class="section-title" id="plugins-title">Plugins add your own commands</h2>
+          <p class="section-intro">A plugin is a folder with a manifest and one JavaScript file. It adds commands to the palette and right-click menus, runs in a sandbox, and gets only the permissions and web hosts you allow when you install it.</p>
+          <ul class="doc-links">
+            <li><a href="docs.html?p=plugins"><strong>Writing plugins</strong><span>Installing, sharing, the manifest, the API and the sandbox.</span></a></li>
+            <li><a href="docs.html?p=agent-guide"><strong>API guide for AI agents</strong><span>Give it to an AI agent to have it write a plugin for you.</span></a></li>
+            <li><a href="docs.html?p=types"><strong>TypeScript types</strong><span><code>sern.d.ts</code>, for completion and checks in your editor.</span></a></li>
+            <li><a href="docs.html?p=examples"><strong>Examples</strong><span>Commit link, Jira issues and Run script, with their code.</span></a></li>
+          </ul>
+        </div>
+        <div>
+          <div class="code-card">
+            <header>sern-plugin.json</header>
+            <pre><code class="language-json">{
+  "id": "sern.commit-link",
+  "name": "Commit link",
+  "version": "1.0.0",
+  "sernApi": 1,
+  "main": "main.js",
+  "permissions": ["repo", "clipboard"],
+  "contributes": {
+    "commands": [
+      { "id": "copy-commit", "title": "Copy commit link", "scope": "commit" }
+    ]
+  }
+}</code></pre>
+          </div>
+          <div class="code-card">
+            <header>main.js</header>
+            <pre><code class="language-javascript">sern.commands.register("copy-commit", async (ctx) =&gt; {
+  // "git@github.com:me/app.git" → "https://github.com/me/app"
+  const base = webUrl(await sern.repo.remoteUrl("origin"));
+  await sern.clipboard.writeText(`${base}/commit/${ctx.commit.id}`);
+  await sern.ui.toast("Link copied", "success");
+});</code></pre>
+          </div>
+          <p class="code-note">Shortened from the <a href="docs.html?p=examples#commit-link">Commit link example</a>, which also defines <code>webUrl</code>. It adds "Copy commit link" to the right-click menu of every commit in History.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="release" id="release" aria-labelledby="release-title" hidden>
+      <div class="wrap split">
+        <div>
+          <h2 class="section-title" id="release-title">What's new</h2>
+          <p class="release-date"></p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="https://github.com/pichaya-su/sern-releases/releases/latest" data-download>
+              <svg class="i" aria-hidden="true"><use href="#i-download"/></svg>Download for Windows
+            </a>
+            <a class="btn btn-quiet" href="https://github.com/pichaya-su/sern-releases/releases">All releases</a>
+          </div>
+        </div>
+        <div class="notes"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-foot">
+    <div class="wrap">
+      <a class="brand" href="./"><img src="assets/icon.svg" alt="" width="22" height="22">SERN</a>
+      <span>A simple, fast Git GUI for Windows.</span>
+      <nav aria-label="Footer">
+        <a href="https://github.com/pichaya-su/sern-releases/releases/latest" data-download>Download</a>
+        <a href="docs.html">Docs</a>
+        <a href="https://github.com/pichaya-su/sern-releases/releases">Releases on GitHub</a>
+      </nav>
+    </div>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <title>SERN app icon</title>
+  <rect width="1024" height="1024" rx="228" fill="#161618"/>
+  <rect x="2" y="2" width="1020" height="1020" rx="226" fill="none" stroke="#FFFFFF" stroke-opacity="0.07" stroke-width="4"/>
+  <path d="M500 322 L772 274 L772 750 L500 702 Z" fill="#FFFFFF"/>
+  <path d="M252 262 L556 192 L556 832 L252 762 Z M295.8 303.9 L500 266.3 L500 757.7 L295.8 720.1 Z" fill="#161618" fill-rule="evenodd" stroke="#161618" stroke-width="56" stroke-linejoin="miter"/>
+  <path d="M252 262 L556 192 L556 832 L252 762 Z M295.8 303.9 L500 266.3 L500 757.7 L295.8 720.1 Z" fill="#FFFFFF" fill-rule="evenodd"/>
+</svg>

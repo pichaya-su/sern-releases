@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SERN docs</title>
+  <meta name="description" content="How to use SERN, the Git GUI for Windows, and how to write plugins for it.">
+  <meta name="theme-color" content="#fbfbfa" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#161615" media="(prefers-color-scheme: dark)">
+  <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400..700&family=JetBrains+Mono:wght@400..700&display=swap">
+  <link rel="stylesheet" href="assets/site.css">
+  <link rel="stylesheet" href="assets/docs.css">
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/powershell.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/dos.min.js"></script>
+  <script defer src="assets/docs.js"></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="site-head">
+    <div class="wrap">
+      <a class="brand" href="./"><img src="assets/icon.svg" alt="" width="28" height="28">SERN</a>
+      <nav class="site-nav" aria-label="Site">
+        <a class="wide" href="./#features">Features</a>
+        <a class="wide" href="./#plugins">Plugins</a>
+        <a href="docs.html" aria-current="page">Docs</a>
+      </nav>
+      <a class="btn btn-primary btn-small" href="https://github.com/pichaya-su/sern-releases/releases/latest">Download</a>
+    </div>
+  </header>
+
+  <div class="wrap docs">
+    <nav class="docs-nav" aria-label="Documentation">
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-list">
+        <span data-current>Guide</span>
+        <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+      </button>
+      <div class="nav-list" id="nav-list">
+        <p class="nav-group">Using SERN</p>
+        <a href="docs.html?p=guide" data-page="guide">Guide</a>
+        <a href="docs.html?p=guide#keyboard-shortcuts">Keyboard shortcuts</a>
+        <p class="nav-group">Plugins</p>
+        <a href="docs.html?p=plugins" data-page="plugins">Writing plugins</a>
+        <a href="docs.html?p=agent-guide" data-page="agent-guide">API guide for AI agents</a>
+        <a href="docs.html?p=types" data-page="types">TypeScript types</a>
+        <a href="docs.html?p=examples" data-page="examples">Examples</a>
+      </div>
+    </nav>
+
+    <main class="docs-main" id="main">
+      <article class="prose" id="doc">
+        <noscript>
+          <h1>SERN docs</h1>
+          <p>These pages need JavaScript. The same docs are in the
+            <a href="https://github.com/pichaya-su/sern-releases/tree/main/docs">docs folder on GitHub</a>.</p>
+        </noscript>
+      </article>
+      <footer class="doc-foot" hidden>
+        <a id="source" href="https://github.com/pichaya-su/sern-releases/tree/main/docs">View this page on GitHub</a>
+      </footer>
+    </main>
+
+    <aside class="docs-toc" aria-labelledby="toc-title" hidden>
+      <p class="toc-title" id="toc-title">On this page</p>
+      <ul id="toc"></ul>
+    </aside>
+  </div>
+</body>
+</html>
