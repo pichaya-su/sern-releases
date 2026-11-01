@@ -156,7 +156,7 @@ with an `Error` whose message explains why.
   | `"password"` | `placeholder` | string (pair with `sern.secrets` for tokens) |
   | `"textarea"` | `placeholder` | string, as typed |
   | `"number"` | `min`, `max`, `step`, `placeholder` | number, or `null` if left empty |
-  | `"select"` | `options` (1–2000), `searchable?` | the chosen option's `value`; starts on the first option |
+  | `"select"` | `options` (1–2000), `searchable?`, `multiple?` | the chosen option's `value`; starts on the first option. With `multiple: true`, an array of the chosen `value`s (in option order), starting `[]` |
   | `"radio"` | `options` (1–20) | the chosen option's `value`, or `""` if none was picked |
   | `"checkbox"` | – | boolean |
   | `"info"` | `label` is the text (≤2000) | none (and it needs no `id`) |
@@ -168,8 +168,11 @@ with an `Error` whose message explains why.
     value, words in any order. Force it with `searchable: true` or turn it off with `searchable: false`. Use a
     `select` for long lists such as users, projects or branches; there's no need to pre-filter. Keep `radio` for
     2–5 visible choices.
+  - `multiple: true` on a `select` lets the user pick several options (labels, reviewers, components). A short
+    list shows as checkboxes, a searchable one as a dropdown that stays open while options are checked. Its
+    starting `value` is an array of option values; `required: true` means at least one must be picked.
   - An option is a string, or `{ value, label? }`. A starting `value` for `select` or `radio` must be one of the
-    options.
+    options (each one, for a multiple select).
   - SERN won't close the form while a required field is empty or a number is outside `min` and `max`: it
     marks the field instead. So you don't need to re-check those. Still validate anything else, such as formats, and throw a clear `Error`.
   - A bad form description rejects with a message naming the field, e.g. `Field 2: "options" must list 1 to

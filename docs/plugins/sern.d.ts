@@ -98,8 +98,13 @@ declare namespace Sern {
         options: (string | { value: string; label?: string })[];
         /** select only: a search box that filters the options. Default: on when there are more than 10. */
         searchable?: boolean;
-        /** Starts on the first option for select, on none for radio. */
-        value?: string;
+        /**
+         * select only: any number of options can be picked, and the value is a list of their values
+         * (in the options' order). Shown as checkboxes, or as a dropdown with checkmarks when searchable.
+         */
+        multiple?: boolean;
+        /** Starts on the first option for select, on none for radio and a multiple select. A list for a multiple select. */
+        value?: string | string[];
         hint?: string;
         required?: boolean;
       }
@@ -164,11 +169,11 @@ declare const sern: {
     confirm(message: string, options?: { title?: string; okLabel?: string; danger?: boolean }): Promise<boolean>;
     /**
      * A dialog with several fields (1 to 20). Resolves to the values by field id: text for
-     * text/textarea/password/select/radio/repo (text trimmed), a number or null for number, a boolean
-     * for checkbox. Null if cancelled. SERN keeps the form open while a required field is empty
+     * text/textarea/password/select/radio/repo (text trimmed), a list of text for a multiple select,
+     * a number or null for number, a boolean for checkbox. Null if cancelled. SERN keeps the form open while a required field is empty
      * or a number is out of range.
      */
-    form(options: { title: string; message?: string; okLabel?: string; fields: Sern.FormField[] }): Promise<Record<string, string | number | boolean | null> | null>;
+    form(options: { title: string; message?: string; okLabel?: string; fields: Sern.FormField[] }): Promise<Record<string, string | string[] | number | boolean | null> | null>;
     /** Shows text in a dialog, e.g. a command's output. */
     showOutput(title: string, text: string): Promise<void>;
   };

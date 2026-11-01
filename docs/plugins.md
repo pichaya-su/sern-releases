@@ -154,7 +154,7 @@ Dialogs from plugins show the plugin's name, and they open one at a time.
 | `text` (default), `password` | a one-line box (`password` hides what's typed) | text; `text` is trimmed |
 | `textarea` | a multi-line box | text |
 | `number` | a number box, with `min`, `max` and `step` | a number, or null |
-| `select` | a dropdown of `options` (up to 2000); with more than 10 it gets a search box | the picked option's `value` |
+| `select` | a dropdown of `options` (up to 2000); with more than 10 it gets a search box | the picked option's `value`; with `multiple: true`, a list of them |
 | `radio` | a row of choices from `options` (up to 20) | the picked option's `value`, or "" |
 | `checkbox` | a checkbox | true or false |
 | `repo` | a list of the git repositories in `folder`, with a search box on top (see below) | the picked repository's full path, or "" |
@@ -168,6 +168,16 @@ A searchable dropdown opens when it's clicked, with an arrow key, or when you ju
 the options whose label or value contains every word typed, in any order: "doe jane" finds "Jane Doe". ↑ ↓ and
 Enter pick one, and Escape closes the list without closing the dialog. Set `searchable: true` or `false` on a
 `select` to choose yourself.
+
+With `multiple: true` a `select` lets the user pick any number of options, and its value is a list of their
+`value`s, in the options' order (`[]` when none is picked; `required` then means at least one). A short list shows
+as checkboxes; a searchable one is a dropdown where clicking or Enter checks and unchecks an option and the list
+stays open. Its starting `value` is a list too.
+
+```js
+{ id: "labels", type: "select", label: "Labels", multiple: true, options: ["bug", "ui", "docs"], value: ["bug"] }
+// values.labels: ["bug", "docs"]
+```
 
 ```js
 const values = await sern.ui.form({

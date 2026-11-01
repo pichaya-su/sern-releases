@@ -9,6 +9,7 @@ const LIGHT_LANES = ["#0d8a78", "#3b6fe0", "#d9480f", "#9a4fd6", "#c88a04", "#0b
 const DARK_LANES = ["#3cc4ae", "#6d9bff", "#ff8a50", "#c08bff", "#f2c14e", "#4cc3f5", "#ff6b9a", "#94d35a"];
 const MONO_UI = '"JetBrains Mono", "Cascadia Mono", Consolas, monospace';
 const SAIRA = '"Saira", "Segoe UI Variable Text", "Segoe UI", sans-serif';
+const RAJDHANI = '"Rajdhani", "Segoe UI", sans-serif';
 
 /**
  * The released themes as Settings → Appearance groups them, with their tokens from the app's
@@ -71,6 +72,15 @@ const THEMES = [
       text: "#1d1a24", muted: "#4a4652", accent: "#9e3a06", accentFg: "#fffaf2",
       lanes: ["#9e3a06", "#1f6f8b", "#a3324e", "#5a4fb5", "#6e6000", "#2a7a5b", "#b5367f", "#4d5a6b"],
       font: SAIRA, corners: 1.6,
+    },
+  ],
+  [
+    {
+      id: "edgerunners", name: "EDGERUNNERS", hint: "HUD black, red linework, cyan readouts",
+      bg: "#0b0b0b", surface: "#0e0e0e", sidebar: "#080808", frame: "#050505", border: "#3a1d1f",
+      text: "#ecebea", muted: "#afaaa9", accent: "#fcee0a", accentFg: "#0b0b0b",
+      lanes: ["#fcee0a", "#5ef6ff", "#b0c4ff", "#a98bff", "#5c8dff", "#ff9de2", "#8fd4ff", "#d9d2a0"],
+      font: RAJDHANI, corners: 0, swatch: "#ff5a55",
     },
   ],
 ];

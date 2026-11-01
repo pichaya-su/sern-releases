@@ -16,8 +16,9 @@ SERN and its setup aren't code-signed yet, so Windows SmartScreen warns the firs
 **More info**, then **Run anyway**. Both need WebView2, which Windows 11 and up-to-date Windows 10 already have.
 
 SERN looks for a new version when it starts and offers **Update and restart**, which installs the update without a
-window of its own and opens SERN again. After an update, SERN shows what's new once. Turn the check off in
-**Settings → General → Updates**, or check by hand with "Check for updates" in the command palette. Versions 0.2.0
+window of its own and opens SERN again. After an update, SERN shows what's new once. While an update waits, a dot
+marks the settings button. **Settings → Updates** lists the patch notes of every release, newest first, and turns
+the check off; check by hand with "Check for updates" in the command palette, or open the notes with "Patch notes". Versions 0.2.0
 and older can't update themselves: install a newer one once by hand.
 
 Running the setup with SERN already installed offers to update, reinstall or downgrade it in place. To uninstall
@@ -30,7 +31,9 @@ from a link. Each repository opens in its own tab, which keeps its own view, sel
 the commit message you're writing, the console, the AI chat and Undo. A fetch, pull or push keeps going when you
 switch away, with a spinner on its tab.
 
-Drag tabs to reorder them. Middle-click a tab, click its **×** or press **Ctrl+W** to close it. The tabs come back
+Drag tabs to reorder them. Middle-click a tab, click its **×** or press **Ctrl+W** to close it. In a narrow window
+the toolbar folds its labels to keep the tabs in view; when they still don't fit, the strip scrolls with the mouse
+wheel and a menu lists every open tab. The branch name in the toolbar lists branches to switch to, like **Ctrl+B**. The tabs come back
 when SERN starts again, and **Open in SERN** in Explorer adds a tab to the window that's already open.
 
 Changes and commits you make in your editor or terminal show up right away; in a background tab, as soon as you
@@ -56,7 +59,8 @@ file alone if it was changed again since.
 
 Diffs have syntax highlighting and show unified or side by side (**Ctrl+Shift+D**). Images show a before and after
 preview. In the side-by-side view, selecting text stays in the column you start in, so a copy gets only the old or
-only the new lines.
+only the new lines. Press **Ctrl+F** in a diff, or click the search button in its toolbar, to search it: matches are
+highlighted and marked on the minimap, and Enter and Shift+Enter step through them.
 
 ## History
 
@@ -202,7 +206,7 @@ Manager.
 ## Appearance
 
 **Settings → Appearance** picks the theme: System (follows Windows), Light, Dark, Glass Light, Glass Dark,
-Telemetry Dark, Telemetry Light, Orbit Dark or Orbit Light. It also sets the interface size, the interface and
+Telemetry Dark, Telemetry Light, Orbit Dark, Orbit Light or EDGERUNNERS. It also sets the interface size, the interface and
 code fonts, and the code font size.
 
 ## Keyboard shortcuts
@@ -214,7 +218,7 @@ code fonts, and the code font size.
 | Ctrl+B | Switch branch |
 | Ctrl+Shift+N | New branch |
 | Ctrl+P / Ctrl+Shift+P | Push / Pull (not from inside a text box) |
-| Ctrl+F | Search commits (in History) |
+| Ctrl+F | Search commits (in History), or search the diff |
 | Ctrl+Shift+F | Fetch |
 | Ctrl+Shift+M | Jump to the commit message |
 | Ctrl+Shift+G | Write the commit message with AI |
