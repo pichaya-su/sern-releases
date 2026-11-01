@@ -20,3 +20,8 @@ publishing a release updates the site.
 - [docs/plugins/sern.d.ts](docs/plugins/sern.d.ts): TypeScript types for the API.
 - Examples: [commit-link](docs/plugins/commit-link), [jira-issues](docs/plugins/jira-issues) and
   [run-script](docs/plugins/run-script).
+
+## License
+
+SERN is free to use, for personal or commercial work, under the [SERN License Agreement](LICENSE). It isn't open
+source: don't redistribute, modify or resell it. Plugins you write are yours to share under any terms.

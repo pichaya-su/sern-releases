@@ -1,0 +1,54 @@
+SERN License Agreement
+
+Copyright (c) 2026 pichaya-su. All rights reserved.
+
+This agreement is between you and pichaya-su, the author of SERN ("we", "us"). It covers the SERN desktop application, its installer, its updates and its documentation (together, "SERN"). By installing or using SERN you agree to it. If you don't agree, don't install or use SERN.
+
+1. Permission to use
+
+SERN is free of charge. We grant you a personal, non-exclusive, non-transferable, revocable permission to install and use SERN on any number of computers you own or control, for personal or commercial work, including work on your employer's or clients' projects.
+
+2. What you may not do
+
+Except where the law allows it regardless of this agreement, you may not:
+a. copy, modify, translate or make derivative works of SERN, except for the copies that installing, running and updating it make;
+b. reverse engineer, decompile or disassemble SERN, or try to obtain its source code;
+c. sell, rent, lease, sublicense or otherwise charge for SERN, or bundle it with a product or service you charge for;
+d. distribute SERN, its installer or its update packages anywhere other than the official download location (https://github.com/pichaya-su/sern-releases), or pass them off as your own;
+e. remove or change any copyright notice, trademark or this agreement in SERN.
+
+3. Plugins
+
+You may write plugins for SERN and share or sell them under any terms you choose. The plugin documentation, type definitions and examples we publish may be used, copied and adapted for that purpose. A plugin is yours; SERN itself stays under this agreement.
+
+4. Your data
+
+SERN works on your computer and your repositories. Features you turn on, such as sign-in to Git hosting services, AI features, plugins and update checks, connect to the services they name. Your code and data remain yours.
+
+5. Ownership
+
+SERN is licensed, not sold. We keep all rights, title and interest in SERN, including its name, logo and all intellectual property in it. Nothing in this agreement grants you any rights to them beyond those in section 1.
+
+6. Third-party software
+
+SERN includes open-source components (such as fonts and libraries) that are licensed to you under their own licenses. Those licenses govern your use of those components, and nothing in this agreement limits rights they give you.
+
+7. Updates and changes
+
+SERN may check for and install updates. We may change or stop offering SERN at any time. A new version may come with a new version of this agreement; using that version means you accept it.
+
+8. No warranty
+
+SERN IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. SERN changes Git repositories on your instructions; keep backups of work you can't afford to lose.
+
+9. Limitation of liability
+
+TO THE FULLEST EXTENT THE LAW ALLOWS, WE ARE NOT LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, INCLUDING LOSS OF DATA, CODE, PROFITS OR BUSINESS, WHETHER IN CONTRACT, TORT OR OTHERWISE, ARISING FROM OR IN CONNECTION WITH SERN OR ITS USE.
+
+10. Termination
+
+This agreement ends automatically if you break it. When it ends, you must stop using SERN and delete your copies. Sections 5, 6, 8, 9 and 10 survive it ending.
+
+11. General
+
+If any part of this agreement can't be enforced, the rest still applies. This is the whole agreement between you and us about SERN.
