@@ -1,10 +1,10 @@
 {
   "id": "sern.jira-issues",
   "name": "Jira issues",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Shows the Jira issues a commit mentions (like ABC-123), with their status, from your Atlassian site.",
   "author": "SERN",
-  "sernApi": 1,
+  "sernApi": 2,
   "main": "main.js",
   "permissions": ["repo", "network", "open-url"],
   "network": ["*.atlassian.net"],

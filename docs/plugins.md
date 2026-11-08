@@ -1,14 +1,15 @@
 # Plugins
 
-A SERN plugin is a folder with a manifest (`sern-plugin.json`) and one JavaScript file. It's shared as a
-**`.sernx` file**, which is a zip of that folder. A plugin adds commands to the command palette and to the
+A SERN plugin is a folder with a manifest (`sern-plugin.json`) and its JavaScript: one file, or
+[several](#splitting-a-plugin-into-files). It's shared as a **`.sernx` file**, which is a zip of that folder. A plugin adds commands to the command palette and to the
 right-click menus of commits, branches and changed files. Each plugin runs in its own sandbox and can only do
 what the user allowed when installing it.
 
 There are two examples:
 
 - [plugins/commit-link](plugins/commit-link) opens a commit or branch on GitHub, GitLab or Bitbucket.
-- [plugins/jira-issues](plugins/jira-issues) calls Jira's API to show the issues a commit mentions.
+- [plugins/jira-issues](plugins/jira-issues) calls Jira's API to show the issues a commit mentions. It's split into
+  several files.
 
 Types for the API are in [plugins/sern.d.ts](plugins/sern.d.ts). To have an AI agent write a plugin, give it
 [plugins/PLUGIN_AGENT_GUIDE.md](plugins/PLUGIN_AGENT_GUIDE.md).
@@ -69,7 +70,7 @@ picks the plugin up the next time you switch to it.
 | Field | |
 |---|---|
 | `id` | Lowercase words, digits and `-`, separated by dots; at most 64 characters. Also the folder name. |
-| `sernApi` | The plugin API version; this SERN runs `1`. |
+| `sernApi` | The plugin API version: `1`, or `2` to [split the plugin into files](#splitting-a-plugin-into-files). |
 | `main` | The script to run, relative to the folder. |
 | `permissions` | Any of the permissions below; leave it out if you need none. |
 | `network` | The hosts the `network` permission may reach: `"api.github.com"`, or `"*.atlassian.net"` for any subdomain. Required with that permission, at most 20. |
@@ -111,6 +112,49 @@ The handler gets what the command was run on:
 | `files` | the selected paths (scope `file`) |
 
 If the handler throws, SERN shows the error.
+
+### Splitting a plugin into files
+
+With `"sernApi": 2`, a plugin can load its other files with `require`. There's nothing to build or set up:
+
+```
+my-plugin/
+  sern-plugin.json        "sernApi": 2, "main": "src/main.js"
+  src/
+    main.js
+    commands/open-issue.js
+    lib/jira.js
+  data/labels.json
+```
+
+```js
+// src/main.js
+const { openIssue } = require("./commands/open-issue.js");
+sern.commands.register("open-issue", openIssue);
+
+// src/commands/open-issue.js
+const jira = require("../lib/jira.js");
+const labels = require("../../data/labels.json");
+exports.openIssue = async (ctx) => { /* … */ };
+```
+
+- A file gets its own scope, and shares what it adds to `exports` or sets as `module.exports`.
+- A path is relative to the file calling `require`, starts with `./` or `../`, and stays in the plugin's folder.
+  The `.js` may be left out. A `.json` file gives its parsed value.
+- A file runs once, the first time it's required. When two files need each other, the second to load gets
+  what the first has exported so far.
+- SERN finds the files to load by reading the `require` calls, so write each path out in full:
+  `require("./lib/" + name)` fails unless that file is also required somewhere with a fixed path.
+- No file can `require` the plugin's `main` script.
+- A plugin's code, all files together, can be at most 5 MB.
+
+Errors the plugin doesn't catch, and failures that aren't a plain `Error` (like a `TypeError`), name the file and
+line: `x is not a function (src/lib/jira.js:12)`.
+
+SERN joins the files into one script when the plugin starts, so a syntax error stops the whole plugin, and a file
+with an unmatched bracket can be reported at a line in the file after it.
+
+### TypeScript and npm packages
 
 The script is a classic script, not a module, so it can't `import`. If you use npm packages or TypeScript, bundle
 them into one file first, for example:

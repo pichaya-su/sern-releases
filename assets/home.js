@@ -10,6 +10,7 @@ const DARK_LANES = ["#3cc4ae", "#6d9bff", "#ff8a50", "#c08bff", "#f2c14e", "#4cc
 const MONO_UI = '"JetBrains Mono", "Cascadia Mono", Consolas, monospace';
 const SAIRA = '"Saira", "Segoe UI Variable Text", "Segoe UI", sans-serif';
 const RAJDHANI = '"Rajdhani", "Segoe UI", sans-serif';
+const ARCHIVO = '"Archivo", "Segoe UI", sans-serif';
 
 /**
  * The released themes as Settings → Appearance groups them, with their tokens from the app's
@@ -81,6 +82,15 @@ const THEMES = [
       text: "#ecebea", muted: "#afaaa9", accent: "#fcee0a", accentFg: "#0b0b0b",
       lanes: ["#fcee0a", "#5ef6ff", "#b0c4ff", "#a98bff", "#5c8dff", "#ff9de2", "#8fd4ff", "#d9d2a0"],
       font: RAJDHANI, corners: 0, swatch: "#ff5a55",
+    },
+  ],
+  [
+    {
+      id: "endfield", name: "ENDFIELD", hint: "Neutral black, contour lines, CMYK marks",
+      bg: "#111111", surface: "#161616", sidebar: "#0e0e0e", frame: "#0a0a0a", border: "#2c2c2c",
+      text: "#e4e9da", muted: "#a9ae9e", accent: "#fff200", accentFg: "#0a0a0a",
+      lanes: ["#e4e9da", "#00e5ff", "#ff00f0", "#d9d2a0", "#3d8bff", "#c6ff00", "#b86bff", "#8fb3cc"],
+      font: ARCHIVO, corners: 0,
     },
   ],
 ];

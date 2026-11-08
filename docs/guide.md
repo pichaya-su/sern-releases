@@ -31,9 +31,10 @@ from a link. Each repository opens in its own tab, which keeps its own view, sel
 the commit message you're writing, the console, the AI chat and Undo. A fetch, pull or push keeps going when you
 switch away, with a spinner on its tab.
 
-Drag tabs to reorder them. Middle-click a tab, click its **×** or press **Ctrl+W** to close it. In a narrow window
-the toolbar folds its labels to keep the tabs in view; when they still don't fit, the strip scrolls with the mouse
-wheel and a menu lists every open tab. The branch name in the toolbar lists branches to switch to, like **Ctrl+B**. The tabs come back
+Drag tabs to reorder them. Middle-click a tab, click its **×** or press **Ctrl+W** to close it. The tabs have the
+top row to themselves; when they don't fit, the strip scrolls with the mouse wheel and a menu lists every open tab.
+The row below acts on the active tab: the branch (a button listing branches to switch to, like **Ctrl+B**), Fetch,
+Pull and Push on the left, and the palette, console and settings on the right. The tabs come back
 when SERN starts again, and **Open in SERN** in Explorer adds a tab to the window that's already open.
 
 Changes and commits you make in your editor or terminal show up right away; in a background tab, as soon as you
@@ -179,6 +180,11 @@ the palette), a commit, a branch or files (from their right-click menus), and ca
 
 Commands run in the repository folder without a shell, so values with spaces stay one argument.
 
+## Git config
+
+**Settings → Git config** shows your global git config file as text to view and edit. Saving is refused if git
+can't parse it, or if the file changed in the meantime.
+
 ## Plugins
 
 Plugins add commands to the palette and right-click menus, and can call web APIs such as Jira or GitHub.
@@ -206,7 +212,7 @@ Manager.
 ## Appearance
 
 **Settings → Appearance** picks the theme: System (follows Windows), Light, Dark, Glass Light, Glass Dark,
-Telemetry Dark, Telemetry Light, Orbit Dark, Orbit Light or EDGERUNNERS. It also sets the interface size, the interface and
+Telemetry Dark, Telemetry Light, Orbit Dark, Orbit Light, EDGERUNNERS or ENDFIELD. It also sets the interface size, the interface and
 code fonts, and the code font size.
 
 ## Keyboard shortcuts

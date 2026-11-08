@@ -1,8 +1,18 @@
-// Types for SERN plugins (plugin API 1): the global `sern` object a plugin's script gets.
+// Types for SERN plugins (plugin API 2): the global `sern` object a plugin's script gets.
 // Copy this file into your plugin project, or point to it with
 // /// <reference path="sern.d.ts" />
 // Every call returns a promise; a refused or failed call rejects with an Error whose
 // message says why.
+
+/**
+ * Plugin API 2: loads another file of the plugin, once, and returns what it exports.
+ * Write the path out in full, relative to the file calling it: "./lib/util.js" or "../data/labels.json".
+ * The ".js" may be left out. A ".json" file gives its parsed value.
+ */
+declare function require(path: string): any;
+/** Plugin API 2, in a file loaded with `require`: what it exports. Add to it, or replace `module.exports`. */
+declare const exports: any;
+declare const module: { exports: any };
 
 declare namespace Sern {
   type Scope = "app" | "new-tab" | "repo" | "commit" | "branch" | "file";

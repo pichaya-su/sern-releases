@@ -3,20 +3,21 @@
 You are writing a plugin for **SERN**, a Git desktop app for Windows. This file is the complete contract. Follow it
 exactly; anything not listed here is not available. Types: [sern.d.ts](sern.d.ts). Human guide:
 [../plugins.md](../plugins.md). Working examples: [commit-link/](commit-link) (reads the repo, opens links) and
-[jira-issues/](jira-issues) (calls a web API with a saved token).
+[jira-issues/](jira-issues) (calls a web API with a saved token, split into several files).
 
 ## 1. What a plugin is
 
-A folder with exactly two required files:
+A folder with two required files, and any others its script loads with `require` (section 4):
 
 ```
 my-plugin/
   sern-plugin.json   ← manifest
-  main.js            ← ONE classic script (no import/export, no modules)
+  main.js            ← a classic script (no import/export)
+  lib/util.js        ← optional, with "sernApi": 2
 ```
 
 - SERN runs `main.js` inside a **Web Worker** sandbox. There is no `window`, no `document`, no DOM, no Node.js,
-  no `require`, no `import`.
+  no `import`. There are no npm packages or Node modules; `require` only loads the plugin's own files.
 - The only way to do anything is the global **`sern`** object. Every `sern.*` call returns a Promise.
 - A plugin adds **commands**. A command appears in the palette or in a right-click menu, and runs your handler.
   Plugins cannot add panels, views, buttons, keyboard shortcuts or settings pages. For input they get prompts,
@@ -85,14 +86,14 @@ Validation rules. A manifest that breaks any of these is refused at install:
 | `version` | Required. Non-empty, at most 32 characters (use semver). |
 | `description` | Optional. At most 300 characters. |
 | `author` | Optional. At most 100 characters. |
-| `sernApi` | Required. Must be the number `1`. |
+| `sernApi` | Required. The number `1`, or `2` if the plugin uses `require` (section 4). |
 | `main` | Required. A path inside the folder, and the file must exist. |
 | `permissions` | Optional. Each one of `repo`, `git`, `actions`, `scripts`, `network`, `open-url`, `clipboard`; an unknown name refuses the whole manifest. |
 | `scripts` | Required with the `scripts` permission, and only allowed with it. An object of up to 20 names and paths: `{ "build": "scripts/build.ps1" }`. A script that runs as administrator is an object instead: `{ "setup": { "path": "scripts/setup.ps1", "admin": true } }`. Names match `^[A-Za-z0-9][\w.-]*$`. Paths are relative to the plugin's folder (`/` or `\`), with no `..`, no drive and no `:`, and end in `.ps1`, `.bat` or `.cmd`. The files must exist when the script runs. |
 | `network` | Required with the `network` permission, and only allowed with it. A list of up to 20 lowercase hosts: either exact (`"api.github.com"`) or `"*.example.com"`, which matches every subdomain but not `example.com` itself. No scheme, port or path. `"*.com"` and `"localhost"` are refused. List the fewest hosts that work. |
 | `contributes.commands` | Optional, at most 50. Each `id` matches `^[A-Za-z0-9][\w.-]*$` (at most 64 characters, no duplicates). Each `title` is non-empty, at most 80 characters, and written as an action ("Copy commit link"). `scope` is one of `app`, `new-tab`, `repo`, `commit`, `branch`, `file`. |
 
-Package limits: at most 2000 files and 50 MB unpacked, and `main.js` at most 5 MB.
+Package limits: at most 2000 files and 50 MB unpacked, and `main.js` with the files it requires at most 5 MB.
 
 ## 4. The script (`main.js`)
 
@@ -103,7 +104,8 @@ Rules:
    you register but don't list never appears.
 2. **The top level must finish within 5 seconds.** Otherwise the plugin is stopped and marked failed. Do only
    setup there; no long work and no loops waiting on anything.
-3. **Classic script only.** If you need npm packages or TypeScript, bundle into one IIFE file:
+3. **Classic scripts only.** No `import` or `export`. To split a plugin into files, use `require` (below). If you
+   need npm packages or TypeScript, bundle into one IIFE file:
    `esbuild src/main.ts --bundle --format=iife --platform=browser --outfile=main.js`
 4. **No `eval`, no `new Function`, no `importScripts`.** All are blocked; some template or compiler libraries
    need them and will fail.
@@ -126,6 +128,37 @@ sern.commands.register("do-thing", async (ctx) => {
   await sern.ui.toast("Done", "success");
 });
 ```
+
+### Splitting a plugin into files
+
+Split a plugin once `main.js` holds more than a few commands. Set `"sernApi": 2` in the manifest and load the other
+files with `require`. Nothing needs building. See [jira-issues/](jira-issues).
+
+```js
+// main.js: only registers commands
+const { openIssue } = require("./commands/open-issue.js");
+sern.commands.register("open-issue", openIssue);
+
+// commands/open-issue.js
+const { jira } = require("../lib/jira.js");
+const labels = require("../data/labels.json");
+exports.openIssue = async (ctx) => { /* … */ };
+
+// lib/jira.js
+exports.jira = async (path) => { /* … */ };   // or: module.exports = { jira };
+```
+
+Rules:
+
+- A path starts with `./` or `../`, is relative to the file calling `require`, and stays inside the plugin's folder.
+  The `.js` may be left out. `.json` files give their parsed value. Other file types can't be required.
+- **Write each path out in full.** SERN finds the files to load by reading the `require` calls, so
+  `require("./lib/" + name)` fails unless that file is also required somewhere with a fixed path. For a set of
+  handlers, require each one and put them in an object.
+- A file has its own scope and runs once, the first time it's required. Don't rely on load order between files that
+  need each other: the second to load only gets what the first has exported so far.
+- No file can `require` the `main` script. Keep shared code in another file.
+- A file's top level counts toward the 5 seconds in rule 2.
 
 ## 5. API reference
 
@@ -350,7 +383,7 @@ Refused, by rejecting immediately:
 
 SERN sends the request itself, so CORS never applies. Any REST API works if its host is listed.
 
-Typical API pattern, with sign-in on first use (see [jira-issues/main.js](jira-issues/main.js)):
+Typical API pattern, with sign-in on first use (see [jira-issues/lib/account.js](jira-issues/lib/account.js)):
 
 ```js
 async function account() {
@@ -437,10 +470,11 @@ sern.commands.register("tag", async (ctx) => {
 ## 8. Checklist before you hand the plugin over
 
 - [ ] `sern-plugin.json` is valid JSON and meets every rule in section 3, including the lowercase `id` and
-      `"sernApi": 1`.
+      `sernApi`: `2` if any file uses `require`, otherwise `1`.
 - [ ] Every `contributes.commands[].id` is registered with `sern.commands.register`, and nothing else is.
-- [ ] `main.js` is one classic script: no `import`, `export`, `require`, `eval`, `new Function`, `fetch` or DOM
-      use. Web calls go through `sern.http.fetch`.
+- [ ] The plugin's files are classic scripts: no `import`, `export`, `eval`, `new Function`, `fetch` or DOM use.
+      Web calls go through `sern.http.fetch`.
+- [ ] Every `require` has a fixed path to a `.js` or `.json` file of the plugin, starting with `./` or `../`.
 - [ ] Each API's host is in `network`, as narrow as possible, and the `network` permission is requested.
 - [ ] Tokens and passwords are asked for with `secret: true` and kept in `sern.secrets`, never in `sern.storage`
       or the code.
@@ -476,3 +510,4 @@ sern.commands.register("tag", async (ctx) => {
 
 You can unit-test plugin logic without SERN by defining a fake `sern` global in Node or Bun before loading
 `main.js`, e.g. `globalThis.sern = { commands: { register: (id, fn) => handlers[id] = fn }, ui: { ... } }`.
+Node and Bun run `require` the same way for these paths, so split plugins load there too.
