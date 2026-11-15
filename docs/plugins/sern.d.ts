@@ -72,7 +72,7 @@ declare namespace Sern {
 
   interface CommitDetails {
     message: string;
-    files: { path: string; origPath: string | null; kind: ChangeKind }[];
+    files: { path: string; origPath: string | null; kind: ChangeKind; added: number | null; removed: number | null }[];
   }
 
   interface GitOutput {

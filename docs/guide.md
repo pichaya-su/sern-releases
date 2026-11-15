@@ -37,6 +37,11 @@ The row below acts on the active tab: the branch (a button listing branches to s
 Pull and Push on the left, and the palette, console and settings on the right. The tabs come back
 when SERN starts again, and **Open in SERN** in Explorer adds a tab to the window that's already open.
 
+Right-click a changed file → **Open in VS Code**, or run **Open repository in VS Code** from the palette. The
+other way, start `sern.exe` with a file's path and its repository opens on that file's changes, or its history if
+it has none; for example a VS Code task with `"command": "sern.exe"` and `"args": ["${file}"]`. A setting starts
+SERN when you sign in to Windows.
+
 Changes and commits you make in your editor or terminal show up right away; in a background tab, as soon as you
 switch to it.
 
@@ -67,7 +72,11 @@ highlighted and marked on the minimap, and Enter and Shift+Enter step through th
 
 The History view (**Ctrl+2**) draws the commit graph across all branches. Open a commit to see its message, files
 and diffs, and search commits with **Ctrl+F**. Right-click a commit to copy its hash, cherry-pick, revert, reword
-or reset to it.
+or reset to it. A commit's files can show as a folder tree instead of a list, with the lines added and removed.
+
+To work on several commits at once, Ctrl-click to add or remove one, or Shift-click (or **Shift+↑/↓**) to select a
+range. Right-click the selection to copy their hashes, cherry-pick or revert them all, squash them into one commit,
+or drop them. Squash and drop open the rebase plan first, so you can check it before anything changes.
 
 ### Drag branches
 
@@ -87,6 +96,8 @@ A rebase stopped to edit or on conflicts continues or aborts from the banner, an
 ### File history and blame
 
 Type a file's name in the toolbar search (**Ctrl+K**) to list the commits that changed it, following renames.
+**Full history** in its header also lists commits from merged branches whose changes to the file weren't kept; it
+is slower, so it's off until you turn it on.
 
 To see who last changed each line, right-click a file in Changes → **Blame**, a file of a commit → **Blame this
 version**, or type `blame <file>` in the palette. Each line shows its commit, author and age, with uncommitted lines
@@ -97,6 +108,10 @@ marked. Click a line's commit to open it in History.
 Switch branches by double-clicking one in the sidebar, or selecting it and pressing Enter (**Ctrl+B** picks one by
 name). Create (**Ctrl+Shift+N**), rename and delete branches, and check out remote branches. If a switch would
 conflict with your changes, SERN offers to stash them first.
+
+Once branches are merged and deleted on the remote, the button in the **Branches** heading deletes every local
+branch whose remote branch is gone. Merged ones go at once, unmerged ones ask once for all of them, and one Undo
+brings them all back.
 
 The **Tags** section in the sidebar lists tags; click one to show its commit in History. Right-click a commit →
 **Create tag here…** (or **+** in Tags for the current commit), with an optional message for an annotated tag and a

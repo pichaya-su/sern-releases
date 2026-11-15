@@ -247,7 +247,7 @@ time.
 | `sern.repo.status()` | `{ branch: { head, oid, upstream, ahead, behind }, files: [{ path, origPath, staged, unstaged }], operation }` |
 | `sern.repo.refs()` | `{ branches: [{ name, remote, head, commit, time, upstream, ahead, behind, gone }], remotes: string[] }` |
 | `sern.repo.log({ limit?, all?, path? })` | `Commit[]`, newest first. `limit` is an integer from 1 to 1000 (default 50). |
-| `sern.repo.commit(id)` | `{ message, files: [{ path, origPath, kind }] }` |
+| `sern.repo.commit(id)` | `{ message, files: [{ path, origPath, kind, added, removed }] }` |
 | `sern.repo.remoteUrl(name = "origin")` | the URL as a string, or `null` if there's no such remote |
 
 `Commit` is `{ id, parents, authorName, authorEmail, time /* unix seconds */, refs, summary }`.
